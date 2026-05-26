@@ -7,9 +7,9 @@ import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/onboarding/data/onboarding_preferences.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/analytics/presentation/analytics_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/transactions/presentation/transactions_screen.dart';
 import 'go_router_refresh_stream.dart';
-import 'placeholder_with_nav.dart';
 import 'route_names.dart';
 import 'widget_kit_screen.dart';
 
@@ -73,7 +73,7 @@ class AppRouter {
         ),
         GoRoute(
           path: Routes.profile,
-          builder: (_, _) => const PlaceholderWithNav(routeName: 'Profile'),
+          builder: (_, _) => const ProfileScreen(),
         ),
         GoRoute(
           path: Routes.widgetKit,

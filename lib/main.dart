@@ -7,6 +7,7 @@ import 'core/di/app_locator.dart';
 import 'core/routing/app_router.dart';
 import 'core/services/biometric_service.dart';
 import 'core/services/seed_service.dart';
+import 'core/services/theme_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/bloc/auth_event.dart';
@@ -31,14 +32,19 @@ Future<void> main() async {
 
   await AuthLocalStore.init();
   await OnboardingPreferences.init();
+  await ThemePreferences.init();
 
   final MockAuthRepository authRepo = MockAuthRepository();
   await authRepo.init();
 
   final LocalTransactionRepository txRepo = LocalTransactionRepository(txBox);
+  final themeNotifier =
+      ValueNotifier<ThemeMode>(ThemePreferences.instance.themeMode);
+
   locator
     ..registerSingleton<TransactionRepository>(txRepo)
     ..registerSingleton<MockAuthRepository>(authRepo)
+    ..registerSingleton<ValueNotifier<ThemeMode>>(themeNotifier)
     ..registerLazySingleton<BiometricService>(BiometricService.new)
     ..registerLazySingleton<SeedService>(() => SeedService(txRepo));
 
@@ -49,7 +55,11 @@ Future<void> main() async {
 
   final GoRouter router = AppRouter.build(authBloc);
 
-  runApp(FinFlowApp(authBloc: authBloc, router: router));
+  runApp(FinFlowApp(
+    authBloc: authBloc,
+    router: router,
+    themeNotifier: themeNotifier,
+  ));
 }
 
 void _registerHiveAdapters() {
@@ -64,23 +74,28 @@ class FinFlowApp extends StatelessWidget {
   const FinFlowApp({
     required this.authBloc,
     required this.router,
+    required this.themeNotifier,
     super.key,
   });
 
   final AuthBloc authBloc;
   final GoRouter router;
+  final ValueNotifier<ThemeMode> themeNotifier;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthBloc>.value(
       value: authBloc,
-      child: MaterialApp.router(
-        title: 'FinFlow',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        routerConfig: router,
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: themeNotifier,
+        builder: (_, ThemeMode mode, _) => MaterialApp.router(
+          title: 'FinFlow',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: mode,
+          routerConfig: router,
+        ),
       ),
     );
   }
