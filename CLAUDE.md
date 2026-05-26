@@ -1,6 +1,6 @@
 # FinFlow — Claude Context File
 
-> Personal finance manager for Indian users. Flutter + Firebase + Razorpay.
+> Personal finance manager for Indian users. Flutter + Firebase + offline-first Hive.
 > Native biometric bridge via MethodChannel is the portfolio differentiator.
 
 ---
@@ -14,7 +14,9 @@
 **Portfolio goal:** Demonstrate senior-level cross-platform engineering — specifically the native bridge work, not just "another expense tracker"
 
 The one-liner that goes on the portfolio:
-> "Cross-platform fintech app featuring native biometric auth (iOS LocalAuthentication + Android BiometricPrompt via MethodChannel), Razorpay payment integration, real-time Firestore sync, fl_chart analytics, and PDF report export. BLoC architecture with offline-first Hive storage."
+> "Cross-platform fintech app with native biometric auth (iOS LocalAuthentication + Android BiometricPrompt via MethodChannel), real-time Firestore sync, fl_chart analytics, offline-first Hive storage, and PDF/CSV export. BLoC architecture, Indian number formatting, full dark/light theme."
+
+> **Note:** Razorpay has been permanently removed from this project. The scope is Firebase auth + native biometric bridge + expense tracker. Do not suggest re-adding payments or Razorpay.
 
 ---
 
@@ -23,7 +25,6 @@ The one-liner that goes on the portfolio:
 **Pattern:** BLoC (flutter_bloc) with feature-first folder structure
 **State:** BLoC for business logic, Hive for offline cache, Firestore for sync
 **Auth:** Firebase Auth (email/password + Google) + native biometric layer
-**Payments:** Razorpay sandbox (test keys only — never commit live keys)
 **Storage:** Firestore (source of truth) → Hive (offline mirror) → UI
 
 ### Folder structure
@@ -34,7 +35,7 @@ lib/
     routing/        # GoRouter config
     constants/      # App-wide constants, asset paths
     utils/          # Formatters (₹ Indian grouping), date helpers
-    services/       # Firebase, Razorpay, biometric, PDF, CSV
+    services/       # Firebase, biometric, PDF, CSV
   features/
     auth/
       bloc/
@@ -42,7 +43,6 @@ lib/
       presentation/ # Screens + widgets
     dashboard/
     transactions/
-    payments/
     analytics/
     profile/
   shared/
@@ -131,10 +131,9 @@ gradient-hero   135deg, #6358E8 → #4A3FC9
 1. **Onboarding** — 3 slides, Lottie animations, Skip + Next CTA
 2. **Sign In** — email/password, Google, biometric (the highlight)
 3. **Dashboard** — balance card (glass), income/expense pills, donut chart (fl_chart), recent transactions, quick actions
-4. **Transactions** — search, filter chips, grouped by date, swipe to edit/delete, CSV/PDF export
-5. **Payments** — Razorpay checkout (UPI, cards, net banking, wallets), split bill UI, success/failure animation
-6. **Analytics** — line chart (monthly trend), bar chart (category breakdown), smart insight card, budget progress bars
-7. **Profile** — avatar, settings groups, theme toggle, logout
+4. **Transactions** — search, filter chips, grouped by date, swipe to edit/delete, CSV export
+5. **Analytics** — area chart (monthly spend vs budget), category bars with trends, smart insight card
+6. **Profile** — avatar hero, XP/streak stats, settings groups, theme toggle (Light/Dark/Auto), PDF export, logout
 
 All screens support both themes from day one. No "we'll add light mode later" — the tokens are in place, use them.
 
@@ -163,9 +162,6 @@ google_fonts
 fl_chart
 lottie
 flutter_svg
-
-# Payments
-razorpay_flutter
 
 # Native bridge (fallback / comparison)
 local_auth
@@ -199,20 +195,21 @@ When seeding data, generating screenshots, or writing tests, use Indian names, m
 
 ## 8. Build Timeline
 
-| Week | Focus |
-|------|-------|
-| 1 | Auth screens + biometric MethodChannel bridge (both platforms) + dashboard UI shell |
-| 2 | Transactions CRUD + Firestore wiring + Hive offline cache + fl_chart on dashboard |
-| 3 | Razorpay sandbox integration + analytics screen + smart insights logic |
-| 4 | PDF/CSV export + profile screen + theme toggle + polish + demo video |
+| Phase | Focus |
+|-------|-------|
+| 7 | Transactions screen — search, filter chips, date-grouped list, swipe-to-delete, CSV export |
+| 8 | Analytics — area chart, category bars with trends, AI insight card |
+| 9 | Profile — avatar hero, settings groups, theme toggle, PDF export, logout |
+| 10 | Polish — skeleton loaders, error states, haptics, app icon, demo video |
+| 11 | (later) Replace mocks with real Firebase backends |
 
-If a week slips, the biometric bridge and Razorpay integration are non-negotiable — they're the portfolio anchors. Cut polish or analytics depth before cutting those.
+The biometric bridge is the non-negotiable portfolio anchor. Cut polish or analytics depth before cutting that.
 
 ---
 
 ## 9. Conventions
 
-- **Naming:** features are lowercase singular (`auth`, `transaction`, `payment`), classes are PascalCase, files are snake_case
+- **Naming:** features are lowercase singular (`auth`, `transaction`, `analytics`), classes are PascalCase, files are snake_case
 - **BLoC files:** `*_bloc.dart`, `*_event.dart`, `*_state.dart` — one BLoC per feature, not per screen
 - **No business logic in widgets** — if a widget has more than a `setState` for local UI state, the logic moves to the BLoC
 - **No hardcoded strings in UI** — route through a constants file or, eventually, `intl` if we localize
@@ -225,7 +222,6 @@ If a week slips, the biometric bridge and Razorpay integration are non-negotiabl
 ## 10. Security & Secrets
 
 - Firebase config: `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) — gitignored, kept in `secrets/` locally
-- Razorpay keys: `.env` file, loaded via `flutter_dotenv`. Sandbox keys only in this repo. Live keys go nowhere near git.
 - Biometric: never store the actual biometric data. The native side returns a boolean success; the app stores a flag in Hive saying "biometric is enabled for user X."
 - Firestore rules: lock reads/writes to `request.auth.uid == resource.data.userId`. Add the rules file to the repo even though it deploys separately — visibility matters.
 
