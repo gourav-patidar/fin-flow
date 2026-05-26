@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/spacing.dart';
@@ -8,6 +9,7 @@ import '../../../features/dashboard/presentation/widgets/add_transaction_sheet.d
 import '../../../features/dashboard/presentation/widgets/bottom_nav.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 import '../../../features/auth/bloc/auth_state.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../../../shared/widgets/transaction_tile.dart';
 import '../bloc/transactions_bloc.dart';
 import '../bloc/transactions_event.dart';
@@ -118,7 +120,7 @@ class _TransactionsViewState extends State<_TransactionsView> {
                 Expanded(
                   child: switch (state.status) {
                     TransactionsStatus.loading =>
-                      const Center(child: CircularProgressIndicator()),
+                      const SkeletonTransactionList(),
                     TransactionsStatus.ready when state.groups.isEmpty =>
                       _EmptyState(onAdd: () => _openAddSheet(context)),
                     TransactionsStatus.ready => _GroupedList(
@@ -445,7 +447,10 @@ class _FilterChipRow extends StatelessWidget {
             label: chip.label,
             count: count,
             active: active,
-            onTap: () => onChanged(chip),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onChanged(chip);
+            },
           );
         },
       ),
@@ -622,8 +627,10 @@ class _TxGroupSection extends StatelessWidget {
                 Dismissible(
                   key: ValueKey<String>(group.transactions[i].id),
                   direction: DismissDirection.endToStart,
-                  onDismissed: (_) =>
-                      onDelete(group.transactions[i].id),
+                  onDismissed: (_) {
+                    HapticFeedback.heavyImpact();
+                    onDelete(group.transactions[i].id);
+                  },
                   background: Container(
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: Spacing.s20),

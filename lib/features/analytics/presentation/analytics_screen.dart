@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/spacing.dart';
@@ -8,6 +9,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../features/dashboard/presentation/widgets/bottom_nav.dart';
 import '../../../features/transactions/data/transaction_repository.dart';
 import '../../../shared/widgets/category_icon.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../bloc/analytics_bloc.dart';
 import '../bloc/analytics_event.dart';
 import '../bloc/analytics_state.dart';
@@ -41,7 +43,9 @@ class _AnalyticsView extends StatelessWidget {
                 _Header(),
                 Expanded(
                   child: state.status == AnalyticsStatus.loading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const SingleChildScrollView(
+                          child: SkeletonAnalytics(),
+                        )
                       : ListView(
                           padding: const EdgeInsets.fromLTRB(
                             Spacing.s20,
@@ -146,7 +150,10 @@ class _PeriodTabs extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => onChanged(p),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  onChanged(p);
+                },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   height: 36,

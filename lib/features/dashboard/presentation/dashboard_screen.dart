@@ -18,6 +18,7 @@ import '../../transactions/data/transaction_repository.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
+import '../../../shared/widgets/skeleton.dart';
 import 'widgets/add_transaction_sheet.dart';
 import 'widgets/balance_card.dart';
 import 'widgets/bottom_nav.dart';
@@ -284,9 +285,6 @@ class _ListLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: Spacing.s24),
-      child: Center(child: CircularProgressIndicator()),
-    );
+    return const SkeletonTransactionList(count: 6);
   }
 }

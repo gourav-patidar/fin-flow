@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/route_names.dart';
@@ -58,6 +59,7 @@ class BottomNav extends StatelessWidget {
                   active: location == tab.route,
                   onTap: () {
                     if (location != tab.route) {
+                      HapticFeedback.selectionClick();
                       context.go(tab.route);
                     }
                   },

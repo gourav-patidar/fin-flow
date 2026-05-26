@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/app_locator.dart';
@@ -457,9 +458,10 @@ class _ThemeTile extends StatelessWidget {
               ),
             ],
             selected: <ThemeMode>{state.themeMode},
-            onSelectionChanged: (Set<ThemeMode> s) => context
-                .read<ProfileBloc>()
-                .add(ProfileThemeChanged(s.first)),
+            onSelectionChanged: (Set<ThemeMode> s) {
+              HapticFeedback.selectionClick();
+              context.read<ProfileBloc>().add(ProfileThemeChanged(s.first));
+            },
             style: SegmentedButton.styleFrom(
               selectedBackgroundColor: accent.withValues(alpha: 0.15),
               selectedForegroundColor: accent,
@@ -546,7 +548,12 @@ class _ExportTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return InkWell(
-      onTap: isLoading ? null : onTap,
+      onTap: isLoading
+          ? null
+          : () {
+              HapticFeedback.lightImpact();
+              onTap();
+            },
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

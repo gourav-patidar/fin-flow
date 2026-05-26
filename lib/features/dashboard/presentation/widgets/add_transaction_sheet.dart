@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/di/app_locator.dart';
@@ -82,6 +83,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     );
     await locator<TransactionRepository>().addTransaction(tx);
     if (!mounted) return;
+    HapticFeedback.mediumImpact();
     Navigator.of(context).pop(true);
   }
 
