@@ -1,30 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/radii.dart';
-
-/// The 8 canonical transaction categories from `CLAUDE.md` section 7. The
-/// string keys are what the Transaction model stores; resolution to icon +
-/// gradient happens here so screens never duplicate the mapping.
-enum TransactionCategory {
-  foodAndDining('Food & Dining'),
-  groceries('Groceries'),
-  transport('Transport'),
-  billsAndUtilities('Bills & Utilities'),
-  shopping('Shopping'),
-  entertainment('Entertainment'),
-  health('Health'),
-  investments('Investments');
-
-  const TransactionCategory(this.label);
-  final String label;
-
-  static TransactionCategory? tryParse(String value) {
-    for (final TransactionCategory c in TransactionCategory.values) {
-      if (c.label == value) return c;
-    }
-    return null;
-  }
-}
+import '../models/transaction_category.dart';
 
 class _CategoryStyle {
   const _CategoryStyle(this.icon, this.gradient);
@@ -96,7 +73,7 @@ class CategoryIcon extends StatelessWidget {
         ),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x2EFFFFFF), // inset highlight approximation
+            color: Color(0x2EFFFFFF),
             offset: Offset(0, 1),
             blurRadius: 0,
           ),

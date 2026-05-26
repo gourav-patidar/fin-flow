@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/models/transaction_category.dart';
 import '../../shared/widgets/app_text_field.dart';
 import '../../shared/widgets/category_icon.dart';
 import '../../shared/widgets/glass_card.dart';

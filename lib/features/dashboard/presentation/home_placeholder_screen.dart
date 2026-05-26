@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/spacing.dart';
+import '../../../core/di/app_locator.dart';
+import '../../../core/services/seed_service.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/secondary_button.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -9,15 +12,21 @@ import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
 
 /// Temporary post-sign-in landing screen. Confirms the auth flow works and
-/// gives us a sign-out action until Phase 6 replaces it with the real
-/// Dashboard.
+/// gives us a sign-out + debug-seed action until Phase 6 replaces it with
+/// the real Dashboard.
 class HomePlaceholderScreen extends StatelessWidget {
   const HomePlaceholderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(
+        title: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onLongPress: kDebugMode ? () => _seed(context) : null,
+          child: const Text('Home'),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Spacing.s20),
@@ -64,6 +73,19 @@ class HomePlaceholderScreen extends StatelessWidget {
                                   .withValues(alpha: 0.6),
                             ),
                           ),
+                          if (kDebugMode) ...<Widget>[
+                            const SizedBox(height: Spacing.s12),
+                            Text(
+                              'Long-press the title bar to seed 30 sample transactions.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.45),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     );
@@ -83,6 +105,16 @@ class HomePlaceholderScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _seed(BuildContext context) async {
+    final AuthState state = context.read<AuthBloc>().state;
+    if (state is! AuthAuthenticated) return;
+    await locator<SeedService>().seed(userId: state.user.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Seeded 30 sample transactions')),
     );
   }
 }
