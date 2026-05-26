@@ -3,11 +3,11 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/auth/bloc/auth_state.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
-import '../../features/dashboard/presentation/home_placeholder_screen.dart';
+import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/onboarding/data/onboarding_preferences.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import 'go_router_refresh_stream.dart';
-import 'placeholder_screen.dart';
+import 'placeholder_with_nav.dart';
 import 'route_names.dart';
 import 'widget_kit_screen.dart';
 
@@ -59,19 +59,21 @@ class AppRouter {
         ),
         GoRoute(
           path: Routes.home,
-          builder: (_, _) => const HomePlaceholderScreen(),
+          builder: (_, _) => const DashboardScreen(),
         ),
         GoRoute(
           path: Routes.transactions,
-          builder: (_, _) => const PlaceholderScreen(routeName: 'Transactions'),
+          builder: (_, _) =>
+              const PlaceholderWithNav(routeName: 'Transactions'),
         ),
         GoRoute(
           path: Routes.analytics,
-          builder: (_, _) => const PlaceholderScreen(routeName: 'Analytics'),
+          builder: (_, _) =>
+              const PlaceholderWithNav(routeName: 'Analytics'),
         ),
         GoRoute(
           path: Routes.profile,
-          builder: (_, _) => const PlaceholderScreen(routeName: 'Profile'),
+          builder: (_, _) => const PlaceholderWithNav(routeName: 'Profile'),
         ),
         GoRoute(
           path: Routes.widgetKit,
